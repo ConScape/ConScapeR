@@ -13,7 +13,7 @@ betweenness_kweighted <- function(h, alpha) {
   return(betw)
 }
 
-betweenness_connected_habitat <- function(h, alpha) {
+connected_habitat <- function(h, alpha) {
   func <- JuliaConnectoR::juliaLet("ConScape.connected_habitat(h, distance_transformation=x -> exp(-x*alpha))", h=h, alpha=alpha)
   return(func)
 }

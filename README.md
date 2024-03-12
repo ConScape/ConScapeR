@@ -25,31 +25,32 @@ First time, install the `ConScape` library in Julia:
 ``` r
 library(ConScapeR)
 
-setup_ConScape("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
 ```
 
 This is a basic example demonstrating the basic workflow:
 
 ``` r
 library(ConScapeR)
+library(terra)
 
-setup_ConScape("your_path_to...../Julia-1.9.3/bin")
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
 
-perm <- rast("data/affinities_2000.asc")
+perm <- terra::rast("data/affinities_2000.asc")
 plot(perm)
 
-hab <- rast("data/suitability_2000.asc")
+hab <- terra::rast("data/suitability_2000.asc")
 plot(hab)
 
-g <- Grid(affinities=perm, sources=hab, targets=hab, costs="x -> -log(x)")
-h <- ConScape_GridRSP(g, theta=0.1)
-betw <- mat2rast(ConScape_betweenness_qweighted(h), perm)
+g <- ConScapeR::Grid(affinities=perm, sources=hab, targets=hab, costs="x -> -log(x)")
+h <- ConScapeR::GridRSP(g, theta=0.1)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_qweighted(h), perm)
 plot(betw)
 
-betw <- mat2rast(ConScape_betweenness_kweighted(h, alpha=1/47), perm)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/47), perm)
 plot(betw)
 
-func <- mat2rast(ConScape_betweenness_connected_habitat(h, alpha=1/47), perm)
+func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/47), perm)
 plot(func)
 ```
 
