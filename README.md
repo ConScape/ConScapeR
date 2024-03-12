@@ -1,5 +1,5 @@
 
-# ConScapeR <img src="man/figures/ConScapeR_hex_logo_hex_logo.png" align="right" alt="" width="150" />
+# ConScapeR <img src="man/figures/ConScapeR_hex_logo.png" align="right" alt="" width="150" />
 
 <!-- badges: start -->
 <!-- badges: end -->
