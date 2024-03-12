@@ -1,7 +1,9 @@
 #' Provide path to the julia installation
 #'
+#' The first time the function is ran, it is best to set the `install_libraries` to TRUE to install the ConScape library in Julia
+#'
 #' @param julia_path
-#' @param install_libraries
+#' @param install_libraries `TRUE/FALSE` for whether the libraries should be installed in Julia (FALSE by default)
 #'
 #' @return
 #' @export
