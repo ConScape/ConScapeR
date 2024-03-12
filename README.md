@@ -20,7 +20,15 @@ devtools::install_github("ConScape/ConScapeR", ref = "HEAD")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+First time, install the `ConScape` library in Julia:
+
+``` r
+library(ConScapeR)
+
+setup_ConScape("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
+```
+
+This is a basic example demonstrating the basic workflow:
 
 ``` r
 library(ConScapeR)
