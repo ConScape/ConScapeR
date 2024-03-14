@@ -4,12 +4,14 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-`ConScapeR` provides a R wrapper to the ConScape library in Julia, which allows the use of ConScape directly from R.
+`ConScapeR` provides a R wrapper to the [ConScape.jl library](https://github.com/ConScape/ConScape.jl) in [Julia](https://julialang.org/), which allows the use of ConScape from an R interface. However, using ConScape from the Julia interface is still recommended for full flexibility. 
 
 ConScape (i.e. 'connected landscapes') is a software library implemented in the high-performance open-source Julia language to compute landscape ecological metrics — originally developed in metapopulation ecology (such as 'metapopulation capacity' and 'probability of connectivity') — for large landscapes. Moreover,in addition to traditional distance metrics used in ecology (i.e. Euclidean and least-cost distance), ConScape implements the randomized shortest paths framework to represent connectivity along the continuum from optimal to random movements.
 
 
 ## Installation
+
+To run ConScape through R, you need to download and install [Julia](https://julialang.org/downloads/) to your computer, which R will run on the background.
 
 To install the development version of the `ConScapeR` R package:
 
@@ -58,13 +60,12 @@ betw <- ConScapeR::betweenness_qweighted(h)
 betw <- ConScapeR::mat2rast(betw)
 plot(betw)
 
-
 # Compute quality-and proximity-weighted betweenness (and convert to raster)
-betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/47), aff)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/100), aff)
 plot(betw)
 
 # Compute habitat functionality (and convert to raster)
-func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/47), aff)
+func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/100), aff)
 plot(func)
 ```
 

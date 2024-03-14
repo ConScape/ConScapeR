@@ -2,13 +2,41 @@
 % Please edit documentation in R/gridrsp.R
 \name{betweenness_kweighted}
 \alias{betweenness_kweighted}
-\title{Title}
+\title{Wrapper for the \code{betweenness_kweighted} function of \code{ConScape}}
 \usage{
 betweenness_kweighted(h, alpha)
 }
 \arguments{
-\item{alpha}{}
+\item{h}{\verb{[GridRSP]} The output from the \code{ConScapeR::GridRSP} function}
+
+\item{alpha}{\verb{[numeric]} The distance scaling for the exponential distance to proximity transformation}
 }
 \description{
-Title
+Computes the quality- and proximity-weighted betweenness for a ConScape.GridRSP object.
+See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+}
+\examples{
+library(ConScapeR)
+library(terra)
+
+# Launch Julia
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
+
+# Create a SpatRaster from a file for the landscape permeability or affinities and habitat suitability
+aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))
+hab <- terra::rast(system.file("data/suitability_2000.asc", package="ConScapeR"))
+
+# Create a ConScape Grid
+g <- ConScapeR::Grid(affinities=aff, sources=hab, targets=hab, costs="x -> -log(x)")
+
+# Create a ConScape GridRSP by providing the randomness parameter theta
+# note: on larger graphs this may be a computation intensive step
+h <- ConScapeR::GridRSP(g, theta=0.1)
+
+# Compute quality-and proximity-weighted betweenness
+betw <- ConScapeR::betweenness_kweighted(h, alpha=1/100)
+
+# Convert matrix to raster
+betw <- ConScapeR::mat2rast(betw)
+plot(betw)
 }

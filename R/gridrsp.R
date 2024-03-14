@@ -77,9 +77,9 @@ connected_habitat <- function(h, alpha) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example examples/expected_cost_example.R
 expected_cost <- function(h) {
-  dists = ConScape.expected_cost(h);
+  dists = JuliaConnectoR::juliaLet("ConScape.expected_cost(h)", h=h)
   return(dists)
 }
 

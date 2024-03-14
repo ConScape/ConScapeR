@@ -2,13 +2,24 @@
 % Please edit documentation in R/conscaper_setup.R
 \name{ConScapeR_setup}
 \alias{ConScapeR_setup}
-\title{Provide path to the julia installation}
+\title{Launch the Julia installation from R and load the \code{ConScape} library in Julia}
 \usage{
 ConScapeR_setup(julia_path, install_libraries = F)
 }
 \arguments{
-\item{install_libraries}{\code{TRUE/FALSE} for whether the libraries should be installed in Julia (FALSE by default)}
+\item{julia_path}{\verb{[character]} The directory for the Julia bin, e.g. "C:/Programs/Julia-1.9.3/bin".}
+
+\item{install_libraries}{\verb{[logical]} If \code{FALSE} (default), Julia will be launched and the required libraries loaded without installing them. If \code{TRUE}, the libraries will be (re-)installed in Julia.}
 }
 \description{
-The first time the function is ran, it is best to set the \code{install_libraries} to TRUE to install the ConScape library in Julia
+The first time the function is ran, it is best to set the \code{install_libraries} to \code{TRUE} to install the \code{ConScape} library in Julia
+}
+\examples{
+library(ConScapeR)
+
+# If the ConScape library is not installed in Julia, run:
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
+
+# If this function has ran successfully before, or the ConScape library has been installed previously in Julia:
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
 }

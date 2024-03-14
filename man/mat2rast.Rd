@@ -9,8 +9,27 @@ mat2rast(mat, rast)
 \arguments{
 \item{mat}{\verb{[matrix]} matrix to be converted}
 
-\item{rast}{\verb{[SpatRaster]} template raster}
+\item{rast}{\verb{[SpatRaster]} template raster, usually one of those used in the \code{ConScapeR::Grid} function}
+}
+\value{
+\verb{[SpatRaster]}
 }
 \description{
 Convert a matrix to raster
+}
+\examples{
+library(ConScapeR)
+library(terra)
+
+# Create a SpatRaster from a file for habitat suitability
+hab <- terra::rast(system.file("data/suitability_2000.asc", package="ConScapeR"))
+plot(hab)
+
+# For this example: convert raster to matrix
+mat <- terra::as.matrix(mat, wide=T)
+image(mat)
+
+# Convert matrix to raster
+r <- ConScapeR::mat2rast(mat, hab)
+plot(r)
 }

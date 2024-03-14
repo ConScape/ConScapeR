@@ -56,8 +56,6 @@ Grid <- function(affinities, sources, targets, costs) {
 }
 
 
-
-
 #' Convert a matrix to raster
 #'
 #' @param mat `[matrix]` matrix to be converted
@@ -70,5 +68,19 @@ Grid <- function(affinities, sources, targets, costs) {
 mat2rast <- function(mat, rast){
   rast2 <- rast(mat, extent=ext(rast), crs = crs(rast))
   return(rast2)
+}
+
+#' Convert a node vector to matrix
+#'
+#' @param vec `[vector]` matrix to be converted
+#' @param g `[Grid]` template raster, usually one of those used in the `ConScapeR::Grid` function
+#'
+#' @return `[matrix]`
+#' @export
+#'
+#' @example examples/vec2mat_example.R
+vec2mat <- function(vec, g){
+  mat <- JuliaConnectoR::juliaLet("ConScape._vec_to_grid(g, vec)", g=g, vec=vec)
+  return(mat)
 }
 

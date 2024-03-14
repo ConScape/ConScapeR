@@ -2,13 +2,36 @@
 % Please edit documentation in R/gridrsp.R
 \name{GridRSP}
 \alias{GridRSP}
-\title{Title}
+\title{Wrapper for the GridRSP function of \code{ConScape}}
 \usage{
 GridRSP(g, theta)
 }
 \arguments{
-\item{theta}{}
+\item{g}{\verb{[Grid]} The output from the \code{ConScapeR::Grid} function}
+
+\item{theta}{\verb{[numeric]} The randomness parameter}
 }
 \description{
-Title
+Creates a GridRSP from a ConScape.Grid and the randomness parameter. Theta closer to zero gives a more random movement,
+as theta increases the RSP distribution will converge to the optimal or least-cost paths.
+Note that the computation becomes numerically unstable as theta becomes really small or large.
+See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+}
+\examples{
+library(ConScapeR)
+library(terra)
+
+# Launch Julia
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
+
+# Create a SpatRaster from a file for the landscape permeability or affinities and habitat suitability
+aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))
+hab <- terra::rast(system.file("data/suitability_2000.asc", package="ConScapeR"))
+
+# Create a ConScape Grid
+g <- ConScapeR::Grid(affinities=aff, sources=hab, targets=hab, costs="x -> -log(x)")
+
+# Create a ConScape GridRSP by providing the randomness parameter theta
+# note: on larger graphs this may be a computation intensive step
+h <- ConScapeR::GridRSP(g, theta=0.1)
 }

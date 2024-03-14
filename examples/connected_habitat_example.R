@@ -16,7 +16,7 @@ g <- ConScapeR::Grid(affinities=aff, sources=hab, targets=hab, costs="x -> -log(
 h <- ConScapeR::GridRSP(g, theta=0.1)
 
 # Compute habitat functionality
-func <- ConScapeR::connected_habitat(h, alpha=1/47)
+func <- ConScapeR::connected_habitat(h, alpha=1/100)
 
 # Convert matrix to raster
 func <- ConScapeR::mat2rast(func)

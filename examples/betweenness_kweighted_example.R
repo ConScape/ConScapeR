@@ -16,7 +16,7 @@ g <- ConScapeR::Grid(affinities=aff, sources=hab, targets=hab, costs="x -> -log(
 h <- ConScapeR::GridRSP(g, theta=0.1)
 
 # Compute quality-and proximity-weighted betweenness
-betw <- ConScapeR::betweenness_kweighted(h, alpha=1/47)
+betw <- ConScapeR::betweenness_kweighted(h, alpha=1/100)
 
 # Convert matrix to raster
 betw <- ConScapeR::mat2rast(betw)
