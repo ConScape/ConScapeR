@@ -10,6 +10,8 @@
 #'
 #' @example examples/ConScapeR_setup_example.R
 ConScapeR_setup <- function(julia_path, install_libraries=F) {
+  require(JuliaConnectoR)
+
   Sys.setenv(JULIA_BINDIR = julia_path)
 
   if (install_libraries){

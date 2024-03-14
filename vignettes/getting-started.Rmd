@@ -1,0 +1,218 @@
+---
+title: "Getting started, basic workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started, basic workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This tutorial is a reimplemention in R from the notebook in Appendix A from van Moorter et al. (2023). For a broad overview of the ConScape library, please refer to van Moorter et al. (2023).
+
+In this first notebook we demonstrate the basic workflow as presented in van Moorter et al. (2023) to compute the amount of connected habitat and the movement flow in four steps:
+
+1. data import and Grid creation;
+2. computation of the GridRSP;
+3. computation of the amount of connected habitat;
+4. movement flow in two variants (weighted by quality or by proximity).
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Setup the environment
+
+Provide the path to the directory for the Julia binary. Remember, you need to have a Julia downloaded and installed on your computer, you can download Julia [here](https://julialang.org/downloads/). If you have not installed the ConScape library before in Julia, you need to set the `install_libraries` argument to ´TRUE`, by default the libraries will not be (re-)installed.
+
+```{r setup, eval = FALSE}
+library(ConScapeR)
+
+# If the ConScape library is not installed in Julia, run:
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
+
+# If ConScape is already installed in Julia:
+ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
+```
+
+```{r, include = FALSE}
+library(JuliaConnectoR)
+library(ConScapeR)
+ConScapeR_setup("C:/Users/bram.van.moorter/AppData/Local/Programs/Julia-1.9.3/bin")
+```
+
+## Step 1: Data import and grid creation
+
+### Import data
+
+We start by importing the input data to be used in ConScape. The network representation of the landscape consists of four parameters: (i) likelihood of movement between two adjacent nodes or pixels, (ii) cost of movement between two adjacent pixels, (iii) suitability of a pixel as a source node, and (iv) suitability of a pixels as a target node. While these data can be provided independently, it is common practice to use functional relationships between some of these parameters to reduce the data requirement.   
+
+We use the `terra` package in R to import these data as spatial rasters:
+
+```{r data import}
+library(terra)
+
+# Create a SpatRaster from a file for the landscape permeability or affinities and habitat suitability
+aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))
+hab <- terra::rast(system.file("data/suitability_2000.asc", package="ConScapeR"))
+plot(aff)
+plot(hab)
+```
+
+
+### Create a Grid object
+
+In our example we will consider an independent likelihood of movement (i) and habitat suitability (iii and iv), we assume the cost of movement a function of the likelihood ($c = -log(a)$) and we assume that suitability as a source and target are identical (sources = targets). Define a ConScape Grid:
+
+```{r grid}
+g <- ConScapeR::Grid(affinities=aff, sources=hab, targets=hab, costs="x -> -log(x)")
+```
+
+In summary, a ConScape Grid describes a graph from a grid of adjacent cells or pixels. It requires four main inputs: the quality of each pixel both as a source and as a target, the affinity between i and j (i.e. probabilities of moving between adjacent pixels i and j), and the cost of moving between between i and j. However, these four inputs can be reduced, for instance, by considering the quality of a pixel identical as a source and target, or by defining the cost as a function of the affinities (e.g. a logarithmic relationship). For our illustration, we introduced those two simplifications and only provided two independent data: the quality of a pixel (identical as source and as target) and the likelihood of moving between adjacent pixels. The likelihood of moving between adjacent pixels i and j was derived from a ‘permeability map’, which describes the permeability of a pixel i (and is similar to the conductivity in circuit theory). The permeability for an i − j pair is derived from the map by the permeability of the target pixel j; the neighbors of a pixel are defined as queen.
+
+## Step 2: GridRSP creation
+
+After defining the ConScape Grid of the landscape between adjacent pixels i and j, we need to compute the paths between non-adjacent source and target pixels s and t using the randomized shortest paths framework. This step is computationally intensive and to avoid recomputing central metrics within the framework (e.g. the Z-matrix), we use the ConScape GridRSP struct to store these metrics together with the Grid. In addition to being demanding in terms of processing, this step is also demanding in terms of memory, because sparse affinity and cost matrices are converted into dense matrices. We implemented strategies to reduce memory footprint by using the sparse representation for the target qualities as explained in Van Moorter et al. (2023) and Notebook on performance.
+
+The GridRSP is computed from a Grid with the  parameter to control the amount of randomness in the paths ($theta \rightarrow 0$ is random movement, whereas $theta \rightarrow \infty$ is optimal movement).
+
+```{r gridrsp}
+h <- ConScapeR::GridRSP(g, theta=0.1)
+```
+
+
+As discussed below and in Van Moorter et al. (2023), large values of theta may result in numerical instabilities resulting in warning messages.
+
+```{r distance matrix}
+# Compute distances from sources (rows) to targets (columns)
+dists <- ConScapeR::expected_cost(h)
+dim(dists)
+```
+
+```{r distance plot}
+# Convert vector to matrix, and matrix to raster of expected cost distances to a target
+dist <- ConScapeR::vec2mat(dists[,950], g)
+dist <- ConScapeR::mat2rast(dist, aff)
+plot(dist)
+```
+
+
+From this GridRSP we can now easily compute a number of derived metrics. For instance, we can compute the distance from all pixels in the landscape to a given target pixel.
+
+In many ecological applications we are not simply interested in the ecological distances, but would rather know the proximity between s and t given a movement capacity of the species (e.g. alpha = 1/100):
+
+
+```{r proximity}
+# Transform a distance to proximity
+# e.g. with an exponential decay function
+alpha <- 1/100
+prox <- exp(-dist*alpha)
+plot(prox)
+```
+
+
+# Computation of habitat functionality
+
+One of the main goals of the ConScape library is the computation of the amount of connected habitat in a landscape. The suitability of habitat is typically evaluated based on the local environmental conditions (both biotic and abiotic). We have coined the term ‘functional habitat’ to evaluate not only the suitability, but also the functional connectivity of habitat. In other words, functional habitat is habitat that is simultaneously suitable and functionally connected. The ConScape library was developed primarily to facilitate this task. The functionality of a pixel is computed with the function connected_habitat:
+
+```{r functionality}
+# Compute habitat functionality (and convert to raster)
+func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/100), aff)
+plot(func)
+```
+
+See Moorter et al. 2021 for a discussion of the expected cost distance and the survival probability. The expected cost distance needs to be transformed to obtain a proximity ($k_{st} \in [0,1]$) necessary for the connected habitat computation, an exponential decay is the most common transformation, with a scaling parameter (here: alpha = 1/100).
+
+We can now sum the pixel functionalities to obtain a landscape-level functionality (similar to: (Saura and Pascual-Hortal 2007)):
+
+```{r landscape functionality}
+sum(values(func), na.rm=T)
+```
+
+By taking the square root of this number, we can compute the amount of connected habitat similar to (Saura et al. 2011):
+
+```{r ECH}
+sqrt(sum(values(func), na.rm=T))
+```
+
+
+When we compare this value to the amount of ‘unconnected’ habitat, we see that there is some loss of habitat due to movement constraints, i.e.:
+
+```{r habitat loss}
+100*(1-sqrt(sum(values(func), na.rm=T))/
+            sum(values(hab), na.rm=T))
+```
+
+
+## Computation of movement flow
+Finally, in addition to computing habitat functionality or amount of connected habitat, the ConScape library also computes the number of paths going through each pixel weighted by the likelihood of the path, which is a node’s ‘betweenness’ in network sciences. However, ConScape also computes the betweenness weighted by the qualities of the source and target node of a path (i.e. quality weighted) and weighted by the qualities of source and target and their proximity (i.e. proximity weighted). This last version is closely related to what Bodin2010ranking called the ‘generalized betweenness centrality’ using the least-cost paths. A bit tongue in cheek, we could call ConScape’s proximity-weighted betweenness the ‘general generalized betweenness centrality’.
+
+The quality-weighted betweenness (betweenness_qweighted) highlights the pixels that are in between high quality pixels:
+
+```{r q-weighted betw}
+# Compute quality-weighted betweenness (and convert to raster)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_qweighted(h), aff)
+plot(betw)
+```
+
+We can also use this function to illustrate the effect of the randomness parameter theta. By setting the quality of two pixels to one while all others are zero we can visualize the distribution over paths between these two pixels, for instance, two pixels:
+
+```{r source target}
+# Create source and target file
+src <- rast(as.matrix(ifel(is.nan(aff), NaN, 1), wide=T), extent=ext(aff), crs = crs(aff))
+src <- ifel(src==1, 0, src)
+tgt <- terra::deepcopy(src)
+src[20, 26] <- 1
+tgt[30, 40] <- 1
+plot(src)
+plot(tgt)
+```
+
+```{r thetas}
+g_tmp <- ConScapeR::Grid(affinities=aff, sources=src, targets=tgt, costs="x -> -log(x)")
+
+thetas = c(2.5, 1.0, 0.5, 0.1, 0.01, 0.001)
+
+for (i in c(1:length(thetas))){
+  h_tmp <- ConScapeR::GridRSP(g_tmp, theta=thetas[i])
+  if (i==1){
+    betw <- ConScapeR::mat2rast(ConScapeR::betweenness_qweighted(h_tmp), aff) 
+  }else{
+    betw <- c(betw, ConScapeR::mat2rast(ConScapeR::betweenness_qweighted(h_tmp), aff) )
+  }
+}
+names(betw) <- thetas
+plot(betw)
+```
+
+We see that as theta becomes larger the path distribution becomes narrowly focused on a single path, i.e. the least-cost path, whereas as theta becomes smaller the path distribution becomes more diffuse, i.e. a random walk.
+
+Finally, the proximity weighted betweenness (betweenness_kweighted) computes the betweenness where paths are weighted by the quality of the source and target, but also by their proximity ($k_{st}$). Here as with the computation of the amount of connected habitat, we need to choose a metric to quantify the proximity (e.g. expected cost or survival probability), and in the case of a distance metric we also need to provide the transformation to proximity (e.g. exponential decay):
+
+```{r k-weighted betw}
+# Compute quality-and proximity-weighted betweenness (and convert to raster)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/100), aff)
+plot(betw)
+```
+
+Quality and proximity weighted betweenness, which we refer to as the ‘movement flow’.
+Thus, the proximity weighted betweenness highlights the pixels that are most in-between high-quality pixels that are functionally connected together. Hence, this metric is expected to capture best the actual movement flows on the landscape (bodin2010ranking).
+
+## Summary
+We showed a basic workflow to demonstrate the main functionalities in the ConScape library. Step 1 is data import and the representation of the landscape as a Grid with connections between adjacent pixels i and j. Step 2 is the computation of the fundamental matrix in the GridRSP for the RSP distribution over all paths between all source s and target t pixels given the randomness of these paths (theta parameter). In steps 3 and 4 the main outputs are computed from the GridRSP: the amount of connected habitat to each pixel and the movement flow through each pixel.
+
+## References
+
+Bodin, Ö., & Saura, S. (2010). Ranking individual habitat patches as connectivity providers: Integrating network analysis and patch removal experiments. Ecological Modelling, 221(19), 2393-2405.\url{https://doi.org/10.1016/j.ecolmodel.2010.06.017}
+
+Saura, S., Estreguil, C., Mouton, C., & Rodríguez-Freire, M. (2011). Network analysis to assess landscape connectivity trends: application to European forests (1990–2000). Ecological Indicators, 11(2), 407-416. \url{https://doi.org/10.1016/j.ecolind.2010.06.011}
+
+Saura, S., & Pascual-Hortal, L. (2007). A new habitat availability index to integrate connectivity in landscape conservation planning: comparison with existing indices and application to a case study. Landscape and urban planning, 83(2-3), 91-103. \url{https://doi.org/10.1016/j.landurbplan.2007.03.005}
+
+Van Moorter, B., Kivimäki, I., Panzacchi, M., & Saerens, M. (2021). Defining and quantifying effective connectivity of landscapes for species' movements. Ecography, 44(6), 870-884. \url{https://doi.org/10.1111/ecog.05351}
+
+Van Moorter, B., Kivimäki, I., Noack, A., Devooght, R., Panzacchi, M., Hall, K. R., Leleux, P. & Saerens, M. (2023). Accelerating advances in landscape connectivity modelling with the ConScape library. Methods in Ecology and Evolution, 14(1), 133–145. \url{https://doi.org/10.1111/2041-210X.13850}
