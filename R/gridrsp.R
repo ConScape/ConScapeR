@@ -1,54 +1,86 @@
-#' Title
+#' Wrapper for the GridRSP function of `ConScape`
 #'
-#' @param g
-#' @param theta
+#' Creates a GridRSP from a ConScape.Grid and the randomness parameter. Theta closer to zero gives a more random movement,
+#' as theta increases the RSP distribution will converge to the optimal or least-cost paths.
+#' Note that the computation becomes numerically unstable as theta becomes really small or large.
+#' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+#'
+#' @param g `[Grid]` The output from the `ConScapeR::Grid` function
+#' @param theta `[numeric]` The randomness parameter
 #'
 #' @return
 #' @export
 #'
-#' @examples
+#' @example examples/GridRSP_example.R
 GridRSP <- function(g, theta) {
   h <- JuliaConnectoR::juliaLet("ConScape.GridRSP(g, θ=theta)", g=g, theta=theta)
   return(h)
 }
 
-#' Title
+#' Wrapper for the `betweenness_qweighted` function of `ConScape`
 #'
-#' @param h
+#' Computes the quality-weighted betweenness for a ConScape.GridRSP object.
+#' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+#'
+#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
 #'
 #' @return
 #' @export
 #'
-#' @examples
+#' @example examples/betweenness_qweighted_example.R
 betweenness_qweighted <- function(h) {
   betw <- JuliaConnectoR::juliaLet("ConScape.betweenness_qweighted(h)", h=h)
   return(betw)
 }
 
-#' Title
+#' Wrapper for the `betweenness_kweighted` function of `ConScape`
 #'
-#' @param h
-#' @param alpha
+#' Computes the quality- and proximity-weighted betweenness for a ConScape.GridRSP object.
+#' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+#'
+#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
+#' @param alpha `[numeric]` The distance scaling for the exponential distance to proximity transformation
 #'
 #' @return
 #' @export
 #'
-#' @examples
+#' @example examples/betweenness_kweighted_example.R
 betweenness_kweighted <- function(h, alpha) {
   betw <- JuliaConnectoR::juliaLet("ConScape.betweenness_kweighted(h, distance_transformation=x -> exp(-x*alpha))", h=h, alpha=alpha)
   return(betw)
 }
 
-#' Title
+#' Wrapper for the `connected_habitat` function of `ConScape`
 #'
-#' @param h
-#' @param alpha
+#' Computes the habitat functionality for a ConScape.GridRSP object.
+#' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+#'
+#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
+#' @param alpha `[numeric]` The distance scaling for the exponential distance to proximity transformation
+#'
+#' @return
+#' @export
+#'
+#' @example examples/connected_habitat_example.R
+connected_habitat <- function(h, alpha) {
+  func <- JuliaConnectoR::juliaLet("ConScape.connected_habitat(h, distance_transformation=x -> exp(-x*alpha))", h=h, alpha=alpha)
+  return(func)
+}
+
+#' Wrapper for the `expected_cost` function of `ConScape`
+#'
+#' Computes the RSP expected cost between all sources and non-zero targets.
+#' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
+#'
+#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
 #'
 #' @return
 #' @export
 #'
 #' @examples
-connected_habitat <- function(h, alpha) {
-  func <- JuliaConnectoR::juliaLet("ConScape.connected_habitat(h, distance_transformation=x -> exp(-x*alpha))", h=h, alpha=alpha)
-  return(func)
+expected_cost <- function(h) {
+  dists = ConScape.expected_cost(h);
+  return(dists)
 }
+
+

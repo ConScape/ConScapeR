@@ -25,6 +25,7 @@ First time, install the `ConScape` library in Julia:
 ``` r
 library(ConScapeR)
 
+# If the ConScape library is not installed in Julia, run:
 ConScapeR_setup("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
 ```
 
@@ -34,23 +35,36 @@ This is a basic example demonstrating the basic workflow:
 library(ConScapeR)
 library(terra)
 
+# Launch Julia
 ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
 
-perm <- terra::rast("data/affinities_2000.asc")
-plot(perm)
-
-hab <- terra::rast("data/suitability_2000.asc")
+# Create a SpatRaster from a file for the landscape permeability or affinities and habitat suitability
+aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))
+hab <- terra::rast(system.file("data/suitability_2000.asc", package="ConScapeR"))
+plot(aff)
 plot(hab)
 
-g <- ConScapeR::Grid(affinities=perm, sources=hab, targets=hab, costs="x -> -log(x)")
+# Create a ConScape Grid
+g <- ConScapeR::Grid(affinities=aff, sources=hab, targets=hab, costs="x -> -log(x)")
+
+# Create a ConScape GridRSP by providing the randomness parameter theta
+# note: on larger graphs this may be a computation intensive step
 h <- ConScapeR::GridRSP(g, theta=0.1)
-betw <- ConScapeR::mat2rast(ConScapeR::betweenness_qweighted(h), perm)
+
+# Compute quality-weighted betweenness
+betw <- ConScapeR::betweenness_qweighted(h)
+
+# Convert matrix to raster
+betw <- ConScapeR::mat2rast(betw)
 plot(betw)
 
-betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/47), perm)
+
+# Compute quality-and proximity-weighted betweenness (and convert to raster)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/47), aff)
 plot(betw)
 
-func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/47), perm)
+# Compute habitat functionality (and convert to raster)
+func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/47), aff)
 plot(func)
 ```
 
