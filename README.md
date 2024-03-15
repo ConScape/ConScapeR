@@ -13,7 +13,7 @@ ConScape (i.e. 'connected landscapes') is a software library implemented in the 
 
 To run ConScape through R, you need to download and install [Julia](https://julialang.org/downloads/) to your computer, which R will run on the background.
 
-You will need to provide the path to this Julia installation. An easy way to do this is by adding it to the `.Renviron` file (more information [here](https://support.posit.co/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf)). The easiest way to edit this file is with the `usethis` library:
+You will need to provide the path to this Julia installation. An easy way to do this is by adding it to the `.Renviron` file (more information [here](https://support.posit.co/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf)), one way to edit this file is with the `usethis` library:
 
 ``` r
 library(usethis)
@@ -24,21 +24,19 @@ Then add to this file the following line:
 
 `JULIA_PATH = "your_path_to...../Julia-1.9.3/bin`
 
-Then you can call this path through:
+From here on you can call this path with:
 ``` r
 Sys.getenv("JULIA_PATH")
 ```
 
-Finally, to install the development version of the `ConScapeR` R package:
+To install the development version of the `ConScapeR` package in R:
 
 ```r
 library(devtools)
 devtools::install_github("ConScape/ConScapeR", ref = "HEAD")
 ```
 
-## Example
-
-First time, install the `ConScape` library in Julia:
+Finally, install the `ConScape` library in Julia:
 
 ``` r
 library(ConScapeR)
@@ -46,6 +44,8 @@ library(ConScapeR)
 # If the ConScape library is not installed in Julia, run:
 ConScapeR_setup(Sys.getenv("JULIA_PATH"), install_libraries=TRUE)
 ```
+
+## Example
 
 This is a basic example demonstrating the basic workflow:
 
