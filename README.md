@@ -13,9 +13,25 @@ ConScape (i.e. 'connected landscapes') is a software library implemented in the 
 
 To run ConScape through R, you need to download and install [Julia](https://julialang.org/downloads/) to your computer, which R will run on the background.
 
-To install the development version of the `ConScapeR` R package:
+You will need to provide the path to this Julia installation. An easy way to do this is by adding it to the `.Renviron` file (more information [here](https://support.posit.co/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf)). The easiest way to edit this file is with the `usethis` library:
 
+``` r
+library(usethis)
+usethis::edit_r_environ()
 ```
+
+Then add to this file the following line:
+
+`JULIA_PATH = "your_path_to...../Julia-1.9.3/bin`
+
+Then you can call this path through:
+``` r
+Sys.getenv("JULIA_PATH")
+```
+
+Finally, to install the development version of the `ConScapeR` R package:
+
+```r
 library(devtools)
 devtools::install_github("ConScape/ConScapeR", ref = "HEAD")
 ```
@@ -28,7 +44,7 @@ First time, install the `ConScape` library in Julia:
 library(ConScapeR)
 
 # If the ConScape library is not installed in Julia, run:
-ConScapeR_setup("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
+ConScapeR_setup(Sys.getenv("JULIA_PATH"), install_libraries=TRUE)
 ```
 
 This is a basic example demonstrating the basic workflow:
@@ -38,7 +54,7 @@ library(ConScapeR)
 library(terra)
 
 # Launch Julia
-ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
+ConScapeR_setup(Sys.getenv("JULIA_PATH"))
 
 # Create a SpatRaster from a file for the landscape permeability or affinities and habitat suitability
 aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))

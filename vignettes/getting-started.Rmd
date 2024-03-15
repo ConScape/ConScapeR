@@ -29,20 +29,14 @@ knitr::opts_chunk$set(
 
 Provide the path to the directory for the Julia binary. Remember, you need to have a Julia downloaded and installed on your computer, you can download Julia [here](https://julialang.org/downloads/). If you have not installed the ConScape library before in Julia, you need to set the `install_libraries` argument to ´TRUE`, by default the libraries will not be (re-)installed.
 
-```{r setup, eval = FALSE}
+```{r setup}
 library(ConScapeR)
 
 # If the ConScape library is not installed in Julia, run:
-ConScapeR_setup("your_path_to...../Julia-1.9.3/bin", install_libraries=TRUE)
+ConScapeR_setup(Sys.getenv("JULIA_PATH"), install_libraries=TRUE)
 
 # If ConScape is already installed in Julia:
-ConScapeR_setup("your_path_to...../Julia-1.9.3/bin")
-```
-
-```{r, include = FALSE}
-library(JuliaConnectoR)
-library(ConScapeR)
-ConScapeR_setup("C:/Users/bram.van.moorter/AppData/Local/Programs/Julia-1.9.3/bin")
+ConScapeR_setup(Sys.getenv("JULIA_PATH"))
 ```
 
 ## Step 1: Data import and grid creation
