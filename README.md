@@ -47,7 +47,7 @@ ConScapeR_setup(Sys.getenv("JULIA_PATH"), install_libraries=TRUE)
 
 ## Example
 
-This is a basic example demonstrating the basic workflow:
+This is an example demonstrating the basic workflow:
 
 ``` r
 library(ConScapeR)
@@ -84,4 +84,5 @@ plot(betw)
 func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/100), aff)
 plot(func)
 ```
+
 

@@ -32,10 +32,7 @@ Provide the path to the directory for the Julia binary. Remember, you need to ha
 ```{r setup}
 library(ConScapeR)
 
-# If the ConScape library is not installed in Julia, run:
-ConScapeR_setup(Sys.getenv("JULIA_PATH"), install_libraries=TRUE)
-
-# If ConScape is already installed in Julia:
+# If ConScape is already installed in Julia (otherwise add argument: install_libraries = TRUE):
 ConScapeR_setup(Sys.getenv("JULIA_PATH"))
 ```
 
@@ -103,7 +100,7 @@ In many ecological applications we are not simply interested in the ecological d
 ```{r proximity}
 # Transform a distance to proximity
 # e.g. with an exponential decay function
-alpha <- 1/100
+alpha <- 1/50
 prox <- exp(-dist*alpha)
 plot(prox)
 ```
@@ -115,7 +112,7 @@ One of the main goals of the ConScape library is the computation of the amount o
 
 ```{r functionality}
 # Compute habitat functionality (and convert to raster)
-func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/100), aff)
+func <- ConScapeR::mat2rast(ConScapeR::connected_habitat(h, alpha=1/50), aff)
 plot(func)
 ```
 
@@ -169,7 +166,7 @@ plot(tgt)
 ```{r thetas}
 g_tmp <- ConScapeR::Grid(affinities=aff, sources=src, targets=tgt, costs="x -> -log(x)")
 
-thetas = c(2.5, 1.0, 0.5, 0.1, 0.01, 0.001)
+thetas = c(10.0, 1.0, 0.1, 0.001)
 
 for (i in c(1:length(thetas))){
   h_tmp <- ConScapeR::GridRSP(g_tmp, theta=thetas[i])
@@ -189,7 +186,7 @@ Finally, the proximity weighted betweenness (betweenness_kweighted) computes the
 
 ```{r k-weighted betw}
 # Compute quality-and proximity-weighted betweenness (and convert to raster)
-betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/100), aff)
+betw <- ConScapeR::mat2rast(ConScapeR::betweenness_kweighted(h, alpha=1/50), aff)
 plot(betw)
 ```
 
