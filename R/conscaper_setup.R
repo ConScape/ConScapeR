@@ -9,16 +9,15 @@
 #' @export
 #'
 #' @example examples/ConScapeR_setup_example.R
-ConScapeR_setup <- function(julia_path, install_libraries=F) {
-  require(JuliaConnectoR)
+ConScapeR_setup <- function(julia_path, install_libraries = FALSE) {
 
   Sys.setenv(JULIA_BINDIR = julia_path)
 
   if (install_libraries){
-    Pkg <- juliaImport("Pkg")
-    juliaEval("Pkg.add(\"ConScape\")")
-    juliaEval("Pkg.add(\"SparseArrays\")")
+    Pkg <- JuliaConnectoR::juliaImport("Pkg")
+    JuliaConnectoR::juliaEval("Pkg.add(\"ConScape\")")
+    JuliaConnectoR::juliaEval("Pkg.add(\"SparseArrays\")")
   }
-  SA <- juliaImport("SparseArrays")
-  CS <- juliaImport("ConScape")
+  SA <- JuliaConnectoR::juliaImport("SparseArrays")
+  CS <- JuliaConnectoR::juliaImport("ConScape")
 }
