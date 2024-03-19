@@ -5,13 +5,18 @@ library(terra)
 ConScapeR_setup(Sys.getenv("JULIA_PATH"))
 
 # Create a SpatRaster from a file for the landscape permeability or affinities
-aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))
+aff <- terra::rast(system.file("extdata/affinities_2000.asc", package="ConScapeR"))
 
 # Create source and target file
-src <- rast(as.matrix(ifel(is.nan(aff), NaN, 1), wide=T), extent=ext(aff), crs = crs(aff))
+aff <- terra::ifel(is.nan(aff), NaN, 1) # raster with 1/NaN
+src <- terra::rast(as.matrix(aff, wide=T),
+                   extent = terra::ext(aff),
+                   crs = terra::crs(aff))
 plot(src)
+
+# copy map and select only one pixel as source and another as target
 tgt <- terra::deepcopy(src)
-tgt <- ifel(tgt==1, 0, tgt)
+tgt <- terra::ifel(tgt == 1, 0, tgt)
 tgt[20, 26] <- 1
 tgt[30, 40] <- 1
 plot(tgt)

@@ -76,8 +76,8 @@ Grid <- function(affinities, sources, targets, costs) {
 
 #' Convert a matrix to raster
 #'
-#' @param mat `[matrix]` Matrix to be converted.
-#' @param rast `[SpatRaster]` Template raster, usually one of those used in the
+#' @param mat `[matrix]` \cr Matrix to be converted.
+#' @param rast `[SpatRaster]` \cr Template raster, usually one of those used in the
 #' [ConScapeR::Grid()] function.
 #'
 #' @return `[SpatRaster]`
@@ -91,8 +91,9 @@ mat2rast <- function(mat, rast){
 
 #' Convert a node vector to matrix
 #'
-#' @param vec `[vector]` matrix to be converted
-#' @param g `[Grid]` template raster, usually one of those used in the `ConScapeR::Grid` function
+#' @param vec `[matrix]` \cr Matrix to be converted
+#' @param g `[Grid]` \cr Template raster, usually one of those used in the
+#' [ConScapeR::Grid()] function.
 #'
 #' @return `[matrix]`
 #' @export
