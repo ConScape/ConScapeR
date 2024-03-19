@@ -7,38 +7,53 @@
 #' but also as a string describing a transformation from the affinity matrix
 #' (e.g. `"x -> -log(x)"`).
 #'
-#' @param affinities `[SpatRaster, matrix]`
-#' @param sources `[SpatRaster, matrix]`
-#' @param targets `[SpatRaster, matrix]`
-#' @param costs `[SpatRaster, matrix, character]`
+#' @param affinities `[SpatRaster, matrix]` \cr The affinities, represent the likelihood
+#' of movement. They can be provided as a `SpatRaster` representing the affinity,
+#' permeability, or resistance of each pixel to movement (in which case it is
+#' internally transformed into a matrix), or as a matrix with affinities between
+#' pairs of sources-targets directly.
+#' @param sources `[SpatRaster, matrix]` \cr Map or matrix presenting the habitat
+#' suitability/quality of source cells.
+#' @param targets `[SpatRaster, matrix]` \cr Map or matrix presenting the habitat
+#' suitability/quality of target cells.
+#' @param costs `[SpatRaster, matrix, character]` \cr Map or matrix presenting the
+#' cost of movement through each cell. Alternatively, a string describing a transformation
+#' from the affinity matrix (e.g. `"x -> -log(x)"`)
 #'
 #' @return
 #' @export
 #'
 #' @example examples/Grid_example.R
 Grid <- function(affinities, sources, targets, costs) {
+  # affinities
   if (class(affinities)[1] == "SpatRaster") {
     affinities <- terra::as.matrix(affinities, wide = T)
   }
+  # sources
   if (class(sources)[1] == "SpatRaster") {
     sources <- terra::as.matrix(sources, wide = T)
   }
+  # targets
   if (class(targets)[1] == "SpatRaster") {
     targets <- terra::as.matrix(targets, wide = T)
   }
+  # costs
   if (class(costs)[1] == "SpatRaster") {
     costs <- terra::as.matrix(costs, wide = T)
   }
+
+  # check NaNs
   if (class(costs)[1] == "matrix") {
     nans <- is.nan(sources) | is.nan(targets) | is.nan(affinities) | is.nan(costs)
     costs[nans] <- NaN
-  }else{
+  } else {
     nans <- is.nan(sources) | is.nan(targets) | is.nan(affinities)
   }
   sources[nans] <- NaN
   targets[nans] <- NaN
   affinities[nans] <- NaN
 
+  # create Grid
   if (class(costs) == "character"){
     g <- JuliaConnectoR::juliaLet(
       paste0("ConScape.Grid(size(affinities)...,
@@ -61,8 +76,9 @@ Grid <- function(affinities, sources, targets, costs) {
 
 #' Convert a matrix to raster
 #'
-#' @param mat `[matrix]` matrix to be converted
-#' @param rast `[SpatRaster]` template raster, usually one of those used in the `ConScapeR::Grid` function
+#' @param mat `[matrix]` Matrix to be converted.
+#' @param rast `[SpatRaster]` Template raster, usually one of those used in the
+#' [ConScapeR::Grid()] function.
 #'
 #' @return `[SpatRaster]`
 #' @export
