@@ -85,7 +85,7 @@ Grid <- function(affinities, sources, targets, costs) {
 #'
 #' @example examples/mat2rast_example.R
 mat2rast <- function(mat, rast){
-  rast2 <- rast(mat, extent = ext(rast), crs = crs(rast))
+  rast2 <- terra::rast(mat, extent = terra::ext(rast), crs = terra::crs(rast))
   return(rast2)
 }
 
