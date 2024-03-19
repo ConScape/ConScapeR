@@ -5,10 +5,11 @@
 #' Note that the computation becomes numerically unstable as theta becomes really small or large.
 #' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
 #'
-#' @param g `[Grid]` The output from the `ConScapeR::Grid` function
-#' @param theta `[numeric]` The randomness parameter
+#' @param g `[Grid]` \cr The output from the [ConScapeR::Grid()] function.
+#' @param theta `[numeric]` \cr The randomness parameter theta. Lower `theta` values
+#' represent a more random walk, and higher values a more least-cost path behavior.
 #'
-#' @return
+#' @return A `ConScape.GridRSP` object within Julia.
 #' @export
 #'
 #' @example examples/GridRSP_example.R
@@ -22,9 +23,9 @@ GridRSP <- function(g, theta) {
 #' Computes the quality-weighted betweenness for a ConScape.GridRSP object.
 #' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
 #'
-#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
+#' @param h `[GridRSP]` \cr The output from the [ConScapeR::GridRSP()] function.
 #'
-#' @return
+#' @return `matrix`
 #' @export
 #'
 #' @example examples/betweenness_qweighted_example.R
@@ -38,10 +39,11 @@ betweenness_qweighted <- function(h) {
 #' Computes the quality- and proximity-weighted betweenness for a ConScape.GridRSP object.
 #' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
 #'
-#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
-#' @param alpha `[numeric]` The distance scaling for the exponential distance to proximity transformation
+#' @param h `[GridRSP]` \cr The output from the [ConScapeR::GridRSP()] function.
+#' @param alpha `[numeric]` \cr The distance scaling for the exponential distance
+#' to proximity transformation.
 #'
-#' @return
+#' @return `matrix`
 #' @export
 #'
 #' @example examples/betweenness_kweighted_example.R
@@ -55,10 +57,11 @@ betweenness_kweighted <- function(h, alpha) {
 #' Computes the habitat functionality for a ConScape.GridRSP object.
 #' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
 #'
-#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
-#' @param alpha `[numeric]` The distance scaling for the exponential distance to proximity transformation
+#' @param h `[GridRSP]` \cr The output from the [ConScapeR::GridRSP()] function.
+#' @param alpha `[numeric]` \cr The distance scaling for the exponential distance to
+#' proximity transformation.
 #'
-#' @return
+#' @return A `matrix` with loca (pixel) measures of habitat functionality.
 #' @export
 #'
 #' @example examples/connected_habitat_example.R
@@ -72,7 +75,7 @@ connected_habitat <- function(h, alpha) {
 #' Computes the RSP expected cost between all sources and non-zero targets.
 #' See Van Moorter et al. (2023, Methods in Ecology and Evolution) for more details.
 #'
-#' @param h `[GridRSP]` The output from the `ConScapeR::GridRSP` function
+#' @param h `[GridRSP]` \cr The output from the [ConScapeR::GridRSP()] function.
 #'
 #' @return
 #' @export

@@ -5,7 +5,7 @@ library(terra)
 ConScapeR_setup(Sys.getenv("JULIA_PATH"))
 
 # Create a SpatRaster from a file for the landscape permeability or affinities
-aff <- terra::rast(system.file("data/affinities_2000.asc", package="ConScapeR"))
+aff <- terra::rast(system.file("extdata/affinities_2000.asc", package="ConScapeR"))
 
 # Create source and target file
 src <- rast(as.matrix(ifel(is.nan(aff), NaN, 1), wide=T), extent=ext(aff), crs = crs(aff))

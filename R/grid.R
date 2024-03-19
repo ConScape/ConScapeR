@@ -20,7 +20,7 @@
 #' cost of movement through each cell. Alternatively, a string describing a transformation
 #' from the affinity matrix (e.g. `"x -> -log(x)"`)
 #'
-#' @return
+#' @return A `ConScape.Grid` object within Julia.
 #' @export
 #'
 #' @example examples/Grid_example.R
